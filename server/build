@@ -21,7 +21,11 @@ npx esbuild "$SCRIPT_DIR/launcher.mjs" \
     --outfile="$TEMP_DIR/build/server_bundle.mjs"
 
 cp -v -f "$SCRIPT_DIR/sea-config.inc.json" "$TEMP_DIR/build/sea-config.json"
-sed -i '' "s;__TEMP_DIR__;$TEMP_DIR;g" "$TEMP_DIR/build/sea-config.json"
+if [[ "$KERNEL" == "Darwin" ]]; then
+    sed -i '' "s;__TEMP_DIR__;$TEMP_DIR;g" "$TEMP_DIR/build/sea-config.json"
+else
+    sed "s;__TEMP_DIR__;$TEMP_DIR;g" -i "$TEMP_DIR/build/sea-config.json"
+fi
 
 node --experimental-sea-config "$TEMP_DIR/build/sea-config.json"
 npx postject "$TEMP_DIR/build/node" \
