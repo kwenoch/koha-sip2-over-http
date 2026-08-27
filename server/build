@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+TEMP_DIR="$(mktemp -d)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)" # get current script dir portibly
+KERNEL="$(uname -s)"
+
+set -e
+set -x
+
+rm -r -f -v "$TEMP_DIR/build"
+mkdir -p -v "$TEMP_DIR/build"
+
+cp -f -v "$(command -v node)" "$TEMP_DIR/build/node"
+if [[ "$KERNEL" == "Darwin" ]]; then
+    codesign --remove-signature "$TEMP_DIR/build/node"
+fi
+
+npx esbuild "$SCRIPT_DIR/launcher.mjs" \
+    --platform=node \
+    --bundle \
+    --outfile="$TEMP_DIR/build/server_bundle.mjs"
+
+cp -v -f "$SCRIPT_DIR/sea-config.inc.json" "$TEMP_DIR/build/sea-config.json"
+sed -i '' "s;__TEMP_DIR__;$TEMP_DIR;g" "$TEMP_DIR/build/sea-config.json"
+
+node --experimental-sea-config "$TEMP_DIR/build/sea-config.json"
+npx postject "$TEMP_DIR/build/node" \
+    NODE_SEA_BLOB "$TEMP_DIR/build/sea-obj.blob" \
+    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 \
+    --macho-segment-name NODE_SEA
+
+mkdir -p -v "$SCRIPT_DIR/dist"
+cp -f -v "$TEMP_DIR/build/node" "$SCRIPT_DIR/dist/server"
+if [[ "$KERNEL" == "Darwin" ]]; then
+    codesign --sign - --force "$SCRIPT_DIR/dist/server"
+fi
+
+rm -r -f -v "$TEMP_DIR/build"
+
+set +x
+set +e

@@ -19,10 +19,8 @@
         "lib": "lib"
     },
     "scripts": {
-        "build:client": "npm run build:client:init && npm run build:client:bundle && node --experimental-sea-config \"client/sea-config.json\" && npx postject \"client/build/node\" NODE_SEA_BLOB \"client/build/sea-obj.blob\" --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 --macho-segment-name NODE_SEA && exit 0",
-        "build:client:bundle": "npx esbuild \"client/launcher.mjs\" --platform=\"node\" --bundle --outfile=\"client/build/client_bundle.mjs\" && exit 0",
-        "build:client:init": "npm run build:client:purge && mkdir -p \"client/build\" && cp \"$(command -v node)\" \"client/build/node\" && codesign --remove-signature \"client/build/node\" && exit 0",
-        "build:client:purge": "rm -rf \"client/build\" && exit 0",
+        "build:client": "bash \"client/build\" && exit 0",
+        "build:server": "bash \"server/build\" && exit 0",
         "exec:client": "node \"client/launcher.mjs\" && exit 0",
         "exec:server": "node \"server/launcher.mjs\" && exit 0",
         "test:client": "echo \"Error: no test specified\" && exit 1",

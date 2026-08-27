@@ -1,0 +1,7 @@
+{
+    "main": "__TEMP_DIR__/build/client_bundle.mjs",
+    "output": "__TEMP_DIR__/build/sea-obj.blob",
+    "disableExperimentalSEAWarning": true,
+    "useSnapshot": false,
+    "useCodeCache": true
+}
