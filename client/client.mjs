@@ -101,15 +101,15 @@ class Client {
     }
 
     finish() {
-        const websocket = this.websocket;
-
-        this._send_websocket_message(websocket, {
+        console.log("[INFO]\tTerminating websocket connection . . . ");
+        this._send_websocket_message(this.websocket, {
             id: this.clientId,
             signal: "CLIENT_FIN",
         });
 
         this.websocket.terminate();
-        console.log("[INFO]\tTerminating connection . . . ");
+        this.websocket = null;
+
         return true;
     }
 }

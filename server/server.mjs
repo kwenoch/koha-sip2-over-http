@@ -80,19 +80,24 @@ class Server {
         });
 
         websocket.on("close", () => {
-            console.log(
-                "[INFO]\tTerminating websocket connection " +
-                    websocket.clientId +
-                    " . . . ",
-            );
-            websocket = null;
+            if (client.readyState === WebSocket.OPEN) {
+                console.log(
+                    "[INFO]\tTerminating websocket connection " +
+                        websocket.clientId +
+                        " . . . ",
+                );
+                this._send_websocket_message(websocket, {
+                    signal: "SERVER_FIN",
+                });
+            }
             if (netsocket != undefined) netsocket.end();
+            websocket = null;
         });
 
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
-            websocket["netsocket"] = null;
             if (websocket != undefined) websocket.terminate();
+            websocket["netsocket"] = null;
         });
 
         websocket.on("error", console.error);
@@ -152,18 +157,9 @@ class Server {
 
     finish() {
         return this.websocketServer.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                console.log(
-                    "[INFO]\tTerminating websocket connection " +
-                        websocket.clientId +
-                        " . . . ",
-                );
-                this._send_websocket_message(websocket, {
-                    signal: "SERVER_FIN",
-                });
-            }
             client.terminate();
             client = null;
+            return true;
         });
     }
 }
