@@ -5,19 +5,13 @@ const client = new Client();
 client.start();
 
 process.on("SIGINT", () => {
-    client.finish() && process.exit(0);
-    // or
-    process.exit(1);
+    (client.finish() && process.exit(0)) || process.exit(1);
 });
 
 process.on("SIGQUIT", () => {
-    client.finish() && process.exit(0);
-    // or
-    process.exit(1);
+    (client.finish() && process.exit(0)) || process.exit(1);
 });
 
 process.on("SIGTERM", () => {
-    client.finish() && process.exit(0);
-    // or
-    process.exit(1);
+    (client.finish() && process.exit(0)) || process.exit(1);
 });
