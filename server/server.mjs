@@ -25,7 +25,7 @@ class Server {
         console.log("[INFO]\tLoaded server . . . ");
     }
 
-    start() {
+    startWebsocket() {
         const netsocketUri =
             "tcp://" + config.sip2.host + ":" + config.sip2.port;
 
@@ -60,15 +60,25 @@ class Server {
 
         websocket.on("message", (data) => {
             const message = JSON.parse(data);
-            console.log("[INFO]\tMessage received: " + JSON.stringify(message));
+            console.log(
+                "[INFO]\tWebsocket message received: " +
+                    JSON.stringify(message),
+            );
 
             if (message.signal == "CLIENT_AUTH_INIT")
                 this.clientAuthInit(websocket, message);
         });
 
+        netsocket.on("data", (data) => {
+            const message = data.toString();
+            console.log("[INFO]\tNetsocket message received: " + message);
+
+            this.serverMsg(websocket, message);
+        });
+
         websocket.on("close", () => {
             console.log(
-                "[INFO]\tTerminating connection " +
+                "[INFO]\tTerminating websocket connection " +
                     websocket.clientId +
                     " . . . ",
             );
@@ -84,7 +94,7 @@ class Server {
     }
 
     serverMsg(websocket, payload = "") {
-        console.log("[INFO]\tNew payload: " + payload);
+        console.log("[INFO]\tNew websocket payload: " + payload);
         return this._send_message(websocket, {
             id: websocket.clientId,
             signal: "SERVER_MSG",
