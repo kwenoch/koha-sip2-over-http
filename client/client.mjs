@@ -98,7 +98,7 @@ class Client {
     }
 
     serverMsg(netsocket, message) {
-        console.log("[DEBUG]\tnetsocket-message: " + message);
+        console.log("[DEBUG]\tnetsocket-message: " + message.data);
         /*if (message.data)
             return this._send_netsocket_message(netsocket, message.data);
         else return;*/
