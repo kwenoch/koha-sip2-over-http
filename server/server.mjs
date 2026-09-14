@@ -137,7 +137,7 @@ class Server {
             return false;
         }
 
-        websocket.write(message);
+        netsocket.write(message);
         console.log("[INFO]\tNetsocket message sent: " + message);
         return true;
     }
