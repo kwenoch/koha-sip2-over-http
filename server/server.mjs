@@ -67,6 +67,8 @@ class Server {
 
             if (message.signal == "CLIENT_AUTH_INIT")
                 this.clientAuthInit(websocket, message);
+            else if (message.signal == "CLIENT_MSG")
+                this.clientMsg(netsocket, message);
         });
 
         netsocket.on("data", (data) => {
@@ -93,32 +95,50 @@ class Server {
         });
     }
 
+    clientAuthInit(websocket, message) {
+        message["id"] = websocket.clientId;
+        message["signal"] = "SERVER_AUTH_ACK";
+        message["data"] = { result: "AUTH_OK" };
+
+        return this._send_websocket_message(websocket, message);
+    }
+
+    clientMsg(netsocket, message) {
+        if (message.data)
+            return this._send_netsocket_message(netsocket, message.data);
+        else return;
+    }
+
     serverMsg(websocket, payload = "") {
         console.log("[INFO]\tNew websocket payload: " + payload);
-        return this._send_message(websocket, {
+        return this._send_websocket_message(websocket, {
             id: websocket.clientId,
             signal: "SERVER_MSG",
             data: payload,
         });
     }
 
-    clientAuthInit(websocket, message) {
-        message["id"] = websocket.clientId;
-        message["signal"] = "SERVER_AUTH_ACK";
-        message["data"] = { result: "AUTH_OK" };
-
-        return this._send_message(websocket, message);
-    }
-
-    _send_message(websocket, input = {}) {
+    _send_websocket_message(websocket, input = {}) {
         const message = JSON.stringify(input);
         if (typeof message !== "string") {
-            console.log("[ERR]\tMessage could not be stringified");
+            console.log("[ERR]\tWebsocket message could not be stringified");
             return false;
         }
 
         websocket.send(message);
-        console.log("[INFO]\tMessage sent: " + message);
+        console.log("[INFO]\tWebsocket message sent: " + message);
+        return true;
+    }
+
+    _send_netsocket_message(netsocket, input = "") {
+        const message = input.toString();
+        if (typeof message !== "string") {
+            console.log("[ERR]\tNetsocket message could not be stringified");
+            return false;
+        }
+
+        websocket.write(message);
+        console.log("[INFO]\tNetsocket message sent: " + message);
         return true;
     }
 
@@ -131,7 +151,7 @@ class Server {
                         " . . . ",
                 );
 
-                this._send_message(client, {
+                this._send_websocket_message(client, {
                     signal: "SERVER_FIN",
                 });
             }

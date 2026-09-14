@@ -43,14 +43,14 @@ class Client {
         console.log("[INFO]\tNew websocket connected . . . ");
 
         websocket.on("open", () => {
-            this._send_message(websocket, {
+            this._send_websocket_message(websocket, {
                 signal: "CLIENT_AUTH_INIT",
             });
         });
 
         websocket.on("message", (data) => {
             const message = JSON.parse(data);
-            console.log("[INFO]\tMessage received: " + JSON.stringify(message));
+            console.log("[INFO]\tWebsocket message received: " + JSON.stringify(message));
 
             if (message.signal == "SERVER_AUTH_ACK")
                 this.serverAuthAck(websocket, message);
@@ -71,7 +71,7 @@ class Client {
 
     clientMsg(websocket, payload = "") {
         console.log("[INFO]\tNew payload: " + payload);
-        return this._send_message(websocket, {
+        return this._send_websocket_message(websocket, {
             id: this.clientId,
             signal: "CLIENT_MSG",
             data: payload,
@@ -85,25 +85,25 @@ class Client {
         message["signal"] = "CLIENT_AUTH_ACK";
         delete message.data;
 
-        return this._send_message(websocket, message);
+        return this._send_websocket_message(websocket, message);
     }
 
-    _send_message(websocket, input = {}) {
+    _send_websocket_message(websocket, input = {}) {
         const message = JSON.stringify(input);
         if (typeof message !== "string") {
-            console.log("[ERR]\tMessage could not be stringified");
+            console.log("[ERR]\tWebsocket message could not be stringified");
             return false;
         }
 
         websocket.send(message);
-        console.log("[INFO]\tMessage sent: " + message);
+        console.log("[INFO]\tWebsocket message sent: " + message);
         return true;
     }
 
     finish() {
         const websocket = this.websocket;
 
-        this._send_message(websocket, {
+        this._send_websocket_message(websocket, {
             id: this.clientId,
             signal: "CLIENT_FIN",
         });
