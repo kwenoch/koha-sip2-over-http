@@ -50,7 +50,7 @@ class Client {
 
         // accept sip messages from stdin
         rl.on("line", (input) => {
-            this.clientMsg(input);
+            this.clientMsg(websocket, input);
         });
     }
 
