@@ -137,7 +137,7 @@ class Server {
             return false;
         }
 
-        netsocket.write(message);
+        netsocket.write(message + '\r\n', "utf-8");
         console.log("[INFO]\tNetsocket message sent: " + message);
         return true;
     }
