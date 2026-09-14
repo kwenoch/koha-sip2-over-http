@@ -4,7 +4,7 @@ import * as net from "node:net";
 import { stdin as input, stdout as output } from "node:process";
 import * as readline from "node:readline/promises";
 import { v6 as uuid } from "uuid";
-import { WebSocketServer } from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 
 const rl = new readline.createInterface({ input, output });
 
