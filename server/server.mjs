@@ -80,7 +80,7 @@ class Server {
         });
 
         websocket.on("close", () => {
-            if (client.readyState === WebSocket.OPEN) {
+            if (websocket.readyState === WebSocket.OPEN) {
                 console.log(
                     "[INFO]\tTerminating websocket connection " +
                         websocket.clientId +
