@@ -6,7 +6,17 @@ import * as readline from "node:readline/promises";
 import { WebSocket } from "ws";
 
 const rl = readline.createInterface({ input, output });
-const socket = new net.Socket();
+
+const config = {
+    websocket: {
+        host: "localhost",
+        port: 8765,
+    },
+    sip2: {
+        host: "localhost",
+        port: 6043,
+    },
+};
 
 class Client {
     constructor() {
@@ -17,15 +27,20 @@ class Client {
     }
 
     start() {
-        console.log("[INFO]\tLaunching client . . . ");
-        this.websocket = new WebSocket("ws://localhost:8765");
-        console.log("[INFO]\tClient running on ws://localhost:8765 . . . ");
+        const websocketUri =
+            "ws://" + config.websocket.host + ":" + config.websocket.port;
+
+        console.log("[INFO]\tLaunching websocket client . . . ");
+        this.websocket = new WebSocket(websocketUri);
+        console.log(
+            "[INFO]\tWebsocket client running on " + websocketUri + " . . . ",
+        );
 
         this.manageSession(this.websocket);
     }
 
     manageSession(websocket) {
-        console.log("[INFO]\tNew server connected . . . ");
+        console.log("[INFO]\tNew websocket connected . . . ");
 
         websocket.on("open", () => {
             this._send_message(websocket, {

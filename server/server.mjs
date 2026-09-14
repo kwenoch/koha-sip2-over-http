@@ -8,6 +8,17 @@ import { WebSocketServer } from "ws";
 
 const rl = new readline.createInterface({ input, output });
 
+const config = {
+    websocket: {
+        host: "localhost",
+        port: 8765,
+    },
+    sip2: {
+        host: "localhost",
+        port: 6043,
+    },
+};
+
 class Server {
     constructor() {
         this.websocketServer = null;
@@ -15,17 +26,34 @@ class Server {
     }
 
     start() {
-        console.log("[INFO]\tLaunching server . . . ");
-        this.websocketServer = new WebSocketServer({ port: 8765 });
-        console.log("[INFO]\tServer running on ws://localhost:8765 . . . ");
+        const netsocketUri =
+            "tcp://" + config.sip2.host + ":" + config.sip2.port;
+
+        console.log("[INFO]\tLaunching websocket server . . . ");
+        this.websocketServer = new WebSocketServer({
+            port: config.websocket.port,
+        });
+        console.log(
+            "[INFO]\tWebsocket server running on ws://localhost:8765 . . . ",
+        );
 
         this.websocketServer.on("connection", (websocket) => {
-            const netClient = new net.createConnection({ port: 6043 });
-            this.manageSession(websocket);
+            console.log("[INFO]\tLaunching netsocket client . . . ");
+            const netsocket = new net.createConnection({
+                host: config.sip2.host,
+                port: config.sip2.port,
+            });
+            console.log(
+                "[INFO]\tNetsocket client running on " +
+                    netsocketUri +
+                    " . . . ",
+            );
+
+            this.manageSession(websocket, netsocket);
         });
     }
 
-    manageSession(websocket) {
+    manageSession(websocket, netsocket) {
         websocket["clientId"] = uuid().toString();
 
         console.log("[INFO]\tNew client connected . . . ");
