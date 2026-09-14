@@ -59,6 +59,7 @@ class Client {
         websocket.on("close", (status) => {
             console.log("[INFO]\tTerminating websocket connection . . . ");
             this.websocket = null;
+            process.exit(0);
         });
 
         websocket.on("error", console.error);
