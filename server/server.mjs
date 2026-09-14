@@ -26,6 +26,8 @@ class Server {
     }
 
     start() {
+        const websocketUri =
+            "ws://" + config.websocket.host + ":" + config.websocket.port;
         const netsocketUri =
             "tcp://" + config.sip2.host + ":" + config.sip2.port;
 
@@ -34,7 +36,7 @@ class Server {
             port: config.websocket.port,
         });
         console.log(
-            "[INFO]\tWebsocket server running on ws://localhost:8765 . . . ",
+            "[INFO]\tWebsocket server running on " + websocketUri + " . . . ",
         );
 
         this.websocketServer.on("connection", (websocket) => {
@@ -57,7 +59,12 @@ class Server {
         const netsocket = websocket["netsocket"];
         websocket["clientId"] = uuid().toString();
 
-        console.log("[INFO]\tNew client connected . . . ");
+        console.log("[INFO]\tNew websocket connected . . . ");
+
+        websocket.on("open", () => {
+            // nothing to do, keep event listener
+            // to nullify default behaviours
+        });
 
         websocket.on("message", (data) => {
             const message = JSON.parse(data);

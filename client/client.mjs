@@ -29,6 +29,8 @@ class Client {
     start() {
         const websocketUri =
             "ws://" + config.websocket.host + ":" + config.websocket.port;
+        const netsocketUri =
+            "tcp://" + config.sip2.host + ":" + config.sip2.port;
 
         console.log("[INFO]\tLaunching websocket client . . . ");
         this.websocket = new WebSocket(websocketUri);
@@ -40,6 +42,7 @@ class Client {
     }
 
     manageSession(websocket) {
+        const netsocket = null;
         console.log("[INFO]\tNew websocket connected . . . ");
 
         websocket.on("open", () => {
@@ -50,16 +53,21 @@ class Client {
 
         websocket.on("message", (data) => {
             const message = JSON.parse(data);
-            console.log("[INFO]\tWebsocket message received: " + JSON.stringify(message));
+            console.log(
+                "[INFO]\tWebsocket message received: " +
+                    JSON.stringify(message),
+            );
 
             if (message.signal == "SERVER_AUTH_ACK")
                 this.serverAuthAck(websocket, message);
+            else if (message.signal == "SERVER_MSG")
+                this.serverMsg(netsocket, message);
         });
 
         websocket.on("close", (status) => {
             console.log("[INFO]\tTerminating websocket connection . . . ");
             this.websocket = null;
-            process.exit(0);
+            process.exit(status);
         });
 
         websocket.on("error", console.error);
@@ -87,6 +95,13 @@ class Client {
         delete message.data;
 
         return this._send_websocket_message(websocket, message);
+    }
+
+    serverMsg(netsocket, message) {
+        console.log("[DEBUG]\tnetsocket-message: " + message);
+        /*if (message.data)
+            return this._send_netsocket_message(netsocket, message.data);
+        else return;*/
     }
 
     _send_websocket_message(websocket, input = {}) {
