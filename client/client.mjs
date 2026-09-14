@@ -57,8 +57,8 @@ class Client {
         });
 
         websocket.on("close", (status) => {
+            console.log("[INFO]\tTerminating websocket connection . . . ");
             this.websocket = null;
-            websocket = null;
         });
 
         websocket.on("error", console.error);
@@ -101,15 +101,8 @@ class Client {
     }
 
     finish() {
-        console.log("[INFO]\tTerminating websocket connection . . . ");
-        this._send_websocket_message(this.websocket, {
-            id: this.clientId,
-            signal: "CLIENT_FIN",
-        });
-
         this.websocket.terminate();
         this.websocket = null;
-
         return true;
     }
 }

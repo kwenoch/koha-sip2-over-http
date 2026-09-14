@@ -85,9 +85,6 @@ class Server {
                     websocket.clientId +
                     " . . . ",
             );
-            this._send_websocket_message(websocket, {
-                signal: "SERVER_FIN",
-            });
             if (netsocket != undefined) netsocket.end();
             websocket = null;
         });
