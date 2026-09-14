@@ -39,7 +39,7 @@ class Server {
 
         this.websocketServer.on("connection", (websocket) => {
             console.log("[INFO]\tLaunching netsocket client . . . ");
-            const netsocket = new net.createConnection({
+            websocket["netsocket"] = new net.createConnection({
                 host: config.sip2.host,
                 port: config.sip2.port,
             });
@@ -49,11 +49,12 @@ class Server {
                     " . . . ",
             );
 
-            this.manageSession(websocket, netsocket);
+            this.manageSession(websocket);
         });
     }
 
-    manageSession(websocket, netsocket) {
+    manageSession(websocket) {
+        const netsocket = websocket["netsocket"];
         websocket["clientId"] = uuid().toString();
 
         console.log("[INFO]\tNew client connected . . . ");
@@ -85,6 +86,13 @@ class Server {
                     " . . . ",
             );
             websocket = null;
+            if (netsocket != undefined) netsocket.end();
+        });
+
+        netsocket.on("end", () => {
+            console.log("[INFO]\tTerminating netsocket connection  . . . ");
+            netsocket = null;
+            if (websocket != undefined) websocket.terminate();
         });
 
         websocket.on("error", console.error);
@@ -137,28 +145,26 @@ class Server {
             return false;
         }
 
-        netsocket.write(message + '\r\n', "utf-8");
+        netsocket.write(message + "\r\n", "utf-8");
         console.log("[INFO]\tNetsocket message sent: " + message);
         return true;
     }
 
     finish() {
-        this.websocketServer.clients.forEach((client) => {
+        return this.websocketServer.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 console.log(
-                    "[INFO]\tTerminating connection " +
-                        client.clientId +
+                    "[INFO]\tTerminating websocket connection " +
+                        websocket.clientId +
                         " . . . ",
                 );
-
-                this._send_websocket_message(client, {
+                this._send_websocket_message(websocket, {
                     signal: "SERVER_FIN",
                 });
             }
             client.terminate();
+            client = null;
         });
-
-        return true;
     }
 }
 
