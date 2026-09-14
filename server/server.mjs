@@ -80,16 +80,14 @@ class Server {
         });
 
         websocket.on("close", () => {
-            if (websocket.readyState === WebSocket.OPEN) {
-                console.log(
-                    "[INFO]\tTerminating websocket connection " +
-                        websocket.clientId +
-                        " . . . ",
-                );
-                this._send_websocket_message(websocket, {
-                    signal: "SERVER_FIN",
-                });
-            }
+            console.log(
+                "[INFO]\tTerminating websocket connection " +
+                    websocket.clientId +
+                    " . . . ",
+            );
+            this._send_websocket_message(websocket, {
+                signal: "SERVER_FIN",
+            });
             if (netsocket != undefined) netsocket.end();
             websocket = null;
         });
