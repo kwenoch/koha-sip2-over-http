@@ -25,7 +25,7 @@ class Server {
         console.log("[INFO]\tLoaded server . . . ");
     }
 
-    startWebsocket() {
+    start() {
         const netsocketUri =
             "tcp://" + config.sip2.host + ":" + config.sip2.port;
 
