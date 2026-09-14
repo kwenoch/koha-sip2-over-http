@@ -91,7 +91,7 @@ class Server {
 
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
-            netsocket = null;
+            websocket["netsocket"] = null;
             if (websocket != undefined) websocket.terminate();
         });
 
