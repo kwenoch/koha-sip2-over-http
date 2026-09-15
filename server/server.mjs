@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 import * as net from "node:net";
-import { stdin, stdout } from "node:process";
+import { stdin as input, stdout as output } from "node:process";
 import * as readline from "node:readline/promises";
 import { v6 as uuid } from "uuid";
 import { WebSocket, WebSocketServer } from "ws";
 import * as yaml from "yaml";
 
-const rl = new readline.createInterface({ stdin, stdout });
+const rl = new readline.createInterface({ input, output });
 
 class Server {
     constructor() {
