@@ -102,6 +102,7 @@ class Client {
         websocket.on("close", () => {
             console.log("[INFO]\tTerminating websocket connection . . . ");
             if (netsocket != undefined) netsocket.end();
+            process.exit(0);
         });
 
         netsocket.on("error", console.error);
