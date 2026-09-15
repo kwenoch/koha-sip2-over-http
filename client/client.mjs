@@ -144,35 +144,13 @@ class Client {
     }
 
     _readyNetsocket(netsocket) {
-        const maxIterations = 333;
-        let iterations = 0;
-        let readyStateEvaluation = setInterval(() => {
-            if (iterations > maxIterations) {
-                clearInterval(readyStateEvaluation);
-                return false;
-            } else if (netsocket.readyState === "open") {
-                clearInterval(readyStateEvaluation);
-                return true;
-            }
-
-            iterations++;
-        }, 15);
+        if (netsocket.readyState === "open") return true;
+        else false;
     }
 
     _readyWebsocket(websocket) {
-        const maxIterations = 333;
-        let iterations = 0;
-        let readyStateEvaluation = setInterval(() => {
-            if (iterations > maxIterations) {
-                clearInterval(readyStateEvaluation);
-                return false;
-            } else if (websocket.readyState === 1) {
-                clearInterval(readyStateEvaluation);
-                return true;
-            }
-            console.log(iterations);
-            iterations++;
-        }, 15);
+        if (websocket.readyState === 1) return true;
+        else return false;
     }
 
     _send_websocket_message(websocket, input = {}) {
@@ -182,10 +160,13 @@ class Client {
             return false;
         }
 
-        if (this._readyWebsocket(websocket)) {
-            websocket.send(message);
-            console.log("[INFO]\tWebsocket message sent: " + message);
-        }
+        let readyStateEvaluator = setInterval(() => {
+            if (this._readyWebsocket(websocket)) {
+                clearInterval(readyStateEvaluator);
+                websocket.send(message);
+                console.log("[INFO]\tWebsocket message sent: " + message);
+            }
+        }, 15);
 
         return true;
     }
@@ -197,10 +178,13 @@ class Client {
             return false;
         }
 
-        if (this._readyNetsocket(netsocket)) {
-            netsocket.write(message + "\r\n", "utf-8");
-            console.log("[INFO]\tNetsocket message sent: " + message);
-        }
+        let readyStateEvaluator = setInterval(() => {
+            if (this._readyNetsocket(netsocket)) {
+                clearInterval(readyStateEvaluator);
+                netsocket.write(message + "\r\n", "utf-8");
+                console.log("[INFO]\tNetsocket message sent: " + message);
+            }
+        }, 15);
 
         return true;
     }
