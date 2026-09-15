@@ -43,7 +43,9 @@ class Client {
                     " . . . ",
             );
 
-            this.manageSession(netsocket);
+            netsocket["websocket"].on("open", () => {
+                this.manageSession(netsocket);
+            });
         });
     }
 
@@ -60,13 +62,13 @@ class Client {
             this._send_websocket_message(websocket, {
                 signal: "CLIENT_AUTH_INIT",
             });
+        });
 
-            netsocket.on("data", (data) => {
-                const message = data.toString();
-                console.log("[INFO]\tNetsocket message received: " + message);
+        netsocket.on("data", (data) => {
+            const message = data.toString();
+            console.log("[INFO]\tNetsocket message received: " + message);
 
-                this.clientMsg(websocket, message);
-            });
+            this.clientMsg(websocket, message);
         });
 
         websocket.on("message", (data) => {
