@@ -43,9 +43,7 @@ class Client {
                     " . . . ",
             );
 
-            netsocket["websocket"].on("open", () => {
-                this.manageSession(netsocket);
-            });
+            netsocket.on("ready", () => this.manageSession(netsocket));
         });
     }
 

@@ -46,9 +46,7 @@ class Server {
                     " . . . ",
             );
 
-            websocket["netsocket"].on("ready", () => {
-                this.manageSession(websocket);
-            });
+            websocket.on("open", () => this.manageSession(websocket));
         });
     }
 
