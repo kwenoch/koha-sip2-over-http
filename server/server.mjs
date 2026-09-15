@@ -119,7 +119,7 @@ class Server {
     clientMsg(netsocket, message) {
         if (message.data)
             return this._send_netsocket_message(netsocket, message.data);
-        else return;
+        else return false;
     }
 
     serverMsg(websocket, payload = "") {

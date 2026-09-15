@@ -33,11 +33,21 @@ class Client {
             "[INFO]\tWebsocket client running on " + websocketUri + " . . . ",
         );
 
+        console.log("[INFO]\tLaunching netsocket server . . . ");
+        this.websocket["netsocket"] = new net.createServer();
+        this.websocket["netsocket"].listen(
+            this.config.sip2.port,
+            this.config.sip2.host,
+        );
+        console.log(
+            "[INFO]\tNetsocket server running on " + netsocketUri + " . . . ",
+        );
+
         this.manageSession(this.websocket);
     }
 
     manageSession(websocket) {
-        const netsocket = null;
+        const netsocket = websocket["netsocket"];
         console.log("[INFO]\tNew websocket connected . . . ");
 
         websocket.on("open", () => {
@@ -93,10 +103,9 @@ class Client {
     }
 
     serverMsg(netsocket, message) {
-        console.log("[DEBUG]\tnetsocket-message: " + message.data);
-        /*if (message.data)
+        if (message.data)
             return this._send_netsocket_message(netsocket, message.data);
-        else return;*/
+        else return false;
     }
 
     _send_websocket_message(websocket, input = {}) {
@@ -108,6 +117,18 @@ class Client {
 
         websocket.send(message);
         console.log("[INFO]\tWebsocket message sent: " + message);
+        return true;
+    }
+
+    _send_netsocket_message(netsocket, input = "") {
+        const message = input.toString();
+        if (typeof message !== "string") {
+            console.log("[ERR]\tNetsocket message could not be stringified");
+            return false;
+        }
+
+        netsocket.write(message + "\r\n", "utf-8");
+        console.log("[INFO]\tNetsocket message sent: " + message);
         return true;
     }
 
