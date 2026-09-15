@@ -57,8 +57,12 @@ class Server {
         console.log("[INFO]\tNew websocket connected . . . ");
 
         websocket.on("open", () => {
-            // nothing to do, keep event listener
-            // to nullify default behaviours
+            netsocket.on("data", (data) => {
+                const message = data.toString();
+                console.log("[INFO]\tNetsocket message received: " + message);
+
+                this.serverMsg(websocket, message);
+            });
         });
 
         netsocket.on("connect", () => {
@@ -77,13 +81,6 @@ class Server {
                 this.clientAuthInit(websocket, message);
             else if (message.signal == "CLIENT_MSG")
                 this.clientMsg(netsocket, message);
-        });
-
-        netsocket.on("data", (data) => {
-            const message = data.toString();
-            console.log("[INFO]\tNetsocket message received: " + message);
-
-            this.serverMsg(websocket, message);
         });
 
         websocket.on("close", () => {

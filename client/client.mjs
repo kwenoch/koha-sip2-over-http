@@ -60,13 +60,13 @@ class Client {
             this._send_websocket_message(websocket, {
                 signal: "CLIENT_AUTH_INIT",
             });
-        });
 
-        netsocket.on("data", (data) => {
-            const message = data.toString();
-            console.log("[INFO]\tNetsocket message received: " + message);
+            netsocket.on("data", (data) => {
+                const message = data.toString();
+                console.log("[INFO]\tNetsocket message received: " + message);
 
-            this.clientMsg(websocket, message);
+                this.clientMsg(websocket, message);
+            });
         });
 
         websocket.on("message", (data) => {
@@ -90,7 +90,8 @@ class Client {
 
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
-            if (netsocket["websocket"] != undefined) netsocket["websocket"].terminate();
+            if (netsocket["websocket"] != undefined)
+                netsocket["websocket"].terminate();
             netsocket = null;
         });
 
