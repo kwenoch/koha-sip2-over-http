@@ -145,6 +145,8 @@ class Client {
                     console.log("[ERROR]\tNo message data found!");
                 }
                 clearInterval(readyStateEvaluator);
+            } else {
+                console.log("not_inited");
             }
         }, 15);
     }
