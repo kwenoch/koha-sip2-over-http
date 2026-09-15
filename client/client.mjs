@@ -47,6 +47,15 @@ class Client {
         });
     }
 
+    loadConfig() {
+        const configFile = fs.readFileSync(
+            import.meta.dirname + "/" + "config.yml",
+            "utf8",
+        );
+        if (typeof configFile == "string") return yaml.parse(configFile);
+        else return false;
+    }
+
     manageSession(netsocket) {
         const websocket = netsocket["websocket"];
 
@@ -132,6 +141,24 @@ class Client {
         else return false;
     }
 
+    _readyWebsocket(websocket) {
+        let readyStateEnsure = setTimeout(() => {
+            if (websocket.readyState === 1 && websocket["initialised"] === 1)
+                clearInterval(readyStateEnsure);
+        }, 15);
+
+        return true;
+    }
+
+    _readyNetsocket(netsocket) {
+        let readyStateEnsure = setTimeout(() => {
+            if (netsocket.readyState === "open")
+                clearInterval(readyStateEnsure);
+        }, 15);
+
+        return true;
+    }
+
     _send_websocket_message(websocket, input = {}) {
         const message = JSON.stringify(input);
         if (typeof message !== "string") {
@@ -139,17 +166,10 @@ class Client {
             return false;
         }
 
-        let readyStateEnsure = setTimeout(() => {
-            if (websocket.readyState === WebSocket.OPEN) {
-                clearInterval(readyStateEnsure);
-                websocket.send(message);
-                console.log("[INFO]\tWebsocket message sent: " + message);
-            } else {
-                console.log(
-                    "[WARN]\tWaiting for websocket to send message . . . ",
-                );
-            }
-        }, 50);
+        if (self._readyWebsocket(websocket)) {
+            websocket.send(message);
+            console.log("[INFO]\tWebsocket message sent: " + message);
+        }
 
         return true;
     }
@@ -161,28 +181,12 @@ class Client {
             return false;
         }
 
-        let readyStateEnsure = setTimeout(() => {
-            if (netsocket.readyState === "open") {
-                clearInterval(readyStateEnsure);
-                netsocket.write(message + "\r\n", "utf-8");
-                console.log("[INFO]\tNetsocket message sent: " + message);
-            } else {
-                console.log(
-                    "[WARN]\tWaiting for websocket to send message . . . ",
-                );
-            }
-        }, 50);
+        if (self._readyNetsocket(netsocket)) {
+            netsocket.write(message + "\r\n", "utf-8");
+            console.log("[INFO]\tNetsocket message sent: " + message);
+        }
 
         return true;
-    }
-
-    loadConfig() {
-        const configFile = fs.readFileSync(
-            import.meta.dirname + "/" + "config.yml",
-            "utf8",
-        );
-        if (typeof configFile == "string") return yaml.parse(configFile);
-        else return false;
     }
 
     end() {
