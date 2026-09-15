@@ -12,7 +12,6 @@ const rl = readline.createInterface({ input, output });
 class Client {
     constructor() {
         this.config = this.loadConfig();
-        this.initialised = false;
         this.netsocketServer = null;
         console.log("[INFO]\tLoaded client . . . ");
     }
@@ -38,6 +37,7 @@ class Client {
         this.netsocketServer.on("connection", (netsocket) => {
             console.log("[INFO]\tLaunching websocket client . . . ");
             netsocket["websocket"] = new WebSocket(websocketUri);
+            netsocket["initialised"] = false;
             console.log(
                 "[INFO]\tWebsocket client running on " +
                     websocketUri +
@@ -58,7 +58,7 @@ class Client {
     }
 
     manageSession(netsocket) {
-        const websocket = netsocket["websocket"];
+        const websocket = netsocket.websocket;
 
         console.log("[INFO]\tNew netsocket connected . . . ");
 
@@ -88,22 +88,22 @@ class Client {
             );
 
             if (message.signal == "SERVER_AUTH_ACK")
-                this.serverAuthAck(websocket, message);
+                this.serverAuthAck(websocket, netsocket, message);
             else if (message.signal == "SERVER_MSG")
                 this.serverMsg(netsocket, message);
         });
 
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
-            if (netsocket["websocket"] != undefined)
-                netsocket["websocket"].terminate();
+            if (netsocket.websocket != undefined)
+                netsocket.websocket.terminate();
             netsocket = null;
         });
 
         websocket.on("close", () => {
             console.log("[INFO]\tTerminating websocket connection . . . ");
             if (netsocket != undefined) netsocket.end();
-            netsocket["websocket"] = null;
+            netsocket.websocket = null;
         });
 
         netsocket.on("error", console.error);
@@ -125,10 +125,11 @@ class Client {
         });
     }
 
-    serverAuthAck(websocket, message) {
+    serverAuthAck(websocket, netsocket, message) {
         this.clientId = message["id"];
-        this.initialised = true;
         console.log("[INFO]\tNew client ID: " + this.clientId);
+
+        netsocket.initialised = true;
 
         message["signal"] = "CLIENT_AUTH_ACK";
         delete message.data;
@@ -137,20 +138,8 @@ class Client {
     }
 
     serverMsg(netsocket, message) {
-        console.log(message);
         if (message.data)
             return this._send_netsocket_message(netsocket, message.data);
-        else return false;
-    }
-
-    _readyNetsocket(netsocket) {
-        if (netsocket.readyState === "open") return true;
-        else false;
-    }
-
-    _readyWebsocket(websocket) {
-        if (websocket.readyState === 1 && websocket["initialised"] === true)
-            return true;
         else return false;
     }
 
@@ -162,10 +151,10 @@ class Client {
         }
 
         let readyStateEvaluator = setInterval(() => {
-            if (this._readyWebsocket(websocket)) {
-                clearInterval(readyStateEvaluator);
+            if (websocket.readyState === 1) {
                 websocket.send(message);
                 console.log("[INFO]\tWebsocket message sent: " + message);
+                clearInterval(readyStateEvaluator);
             }
         }, 15);
 
@@ -180,10 +169,10 @@ class Client {
         }
 
         let readyStateEvaluator = setInterval(() => {
-            if (this._readyNetsocket(netsocket)) {
-                clearInterval(readyStateEvaluator);
+            if (netsocket.readyState === "open") {
                 netsocket.write(message + "\r\n", "utf-8");
                 console.log("[INFO]\tNetsocket message sent: " + message);
+                clearInterval(readyStateEvaluator);
             }
         }, 15);
 

@@ -61,7 +61,7 @@ class Server {
     }
 
     manageSession(websocket) {
-        const netsocket = websocket["netsocket"];
+        const netsocket = websocket.netsocket;
         websocket["clientId"] = uuid().toString();
 
         console.log("[INFO]\tNew websocket connected . . . ");
@@ -102,15 +102,15 @@ class Server {
                     websocket.clientId +
                     " . . . ",
             );
-            if (websocket["netsocket"] != undefined)
-                websocket["netsocket"].end();
+            if (websocket.netsocket != undefined)
+                websocket.netsocket.end();
             websocket = null;
         });
 
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
             if (websocket != undefined) websocket.terminate();
-            websocket["netsocket"] = null;
+            websocket.netsocket = null;
         });
 
         websocket.on("error", console.error);
@@ -127,7 +127,8 @@ class Server {
         message["id"] = websocket.clientId;
         message["signal"] = "SERVER_AUTH_ACK";
         message["data"] = { result: "AUTH_OK" };
-        websocket["initialised"] = true;
+
+        websocket.initialised = true;
 
         return this._send_websocket_message(websocket, message);
     }
@@ -147,17 +148,6 @@ class Server {
         });
     }
 
-    _readyWebsocket(websocket) {
-        if (websocket.readyState === 1 && websocket["initialised"] === true)
-            return true;
-        else return false;
-    }
-
-    _readyNetsocket(netsocket) {
-        if (netsocket.readyState === "open") return true;
-        else false;
-    }
-
     _send_websocket_message(websocket, input = {}) {
         const message = JSON.stringify(input);
         if (typeof message !== "string") {
@@ -166,10 +156,10 @@ class Server {
         }
 
         let readyStateEvaluator = setInterval(() => {
-            if (this._readyWebsocket(websocket)) {
-                clearInterval(readyStateEvaluator);
+            if (websocket.readyState === 1) {
                 websocket.send(message);
                 console.log("[INFO]\tWebsocket message sent: " + message);
+                clearInterval(readyStateEvaluator);
             }
         }, 15);
 
@@ -184,10 +174,10 @@ class Server {
         }
 
         let readyStateEvaluator = setInterval(() => {
-            if (this._readyNetsocket(netsocket)) {
-                clearInterval(readyStateEvaluator);
+            if (netsocket.readyState === "open") {
                 netsocket.write(message + "\r\n", "utf-8");
                 console.log("[INFO]\tNetsocket message sent: " + message);
+                clearInterval(readyStateEvaluator);
             }
         }, 15);
 
