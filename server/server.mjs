@@ -170,7 +170,7 @@ class Server {
             return false;
         }
 
-        if (self._readyWebsocket(websocket)) {
+        if (this._readyWebsocket(websocket)) {
             websocket.send(message);
             console.log("[INFO]\tWebsocket message sent: " + message);
         }
@@ -185,7 +185,7 @@ class Server {
             return false;
         }
 
-        if (self._readyNetsocket(netsocket)) {
+        if (this._readyNetsocket(netsocket)) {
             netsocket.write(message + "\r\n", "utf-8");
             console.log("[INFO]\tNetsocket message sent: " + message);
         }
