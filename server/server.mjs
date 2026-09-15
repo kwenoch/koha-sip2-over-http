@@ -36,11 +36,11 @@ class Server {
 
         this.websocketServer.on("connection", (websocket) => {
             console.log("[INFO]\tLaunching netsocket client . . . ");
-            websocket["initialised"] = false;
             websocket["netsocket"] = new net.createConnection({
                 host: this.config.sip2.host,
                 port: this.config.sip2.port,
             });
+            websocket.netsocket["initialised"] = false;
             console.log(
                 "[INFO]\tNetsocket client running on " +
                     netsocketUri +
@@ -102,8 +102,7 @@ class Server {
                     websocket.clientId +
                     " . . . ",
             );
-            if (websocket.netsocket != undefined)
-                websocket.netsocket.end();
+            if (websocket.netsocket != undefined) websocket.netsocket.end();
             websocket = null;
         });
 
@@ -128,15 +127,22 @@ class Server {
         message["signal"] = "SERVER_AUTH_ACK";
         message["data"] = { result: "AUTH_OK" };
 
-        websocket.initialised = true;
+        websocket.netsocket.initialised = true;
 
         return this._send_websocket_message(websocket, message);
     }
 
     clientMsg(netsocket, message) {
-        if (message.data)
-            return this._send_netsocket_message(netsocket, message.data);
-        else return false;
+        let readyStateEvaluator = setInterval(() => {
+            if (netsocket.initialised === true) {
+                if (message.data) {
+                    this._send_netsocket_message(netsocket, message.data);
+                } else {
+                    console.log("[ERROR]\tNo message data found!");
+                }
+                clearInterval(readyStateEvaluator);
+            }
+        });
     }
 
     serverMsg(websocket, payload = "") {

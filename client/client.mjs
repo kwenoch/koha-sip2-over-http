@@ -35,9 +35,9 @@ class Client {
         );
 
         this.netsocketServer.on("connection", (netsocket) => {
+            netsocket["initialised"] = false;
             console.log("[INFO]\tLaunching websocket client . . . ");
             netsocket["websocket"] = new WebSocket(websocketUri);
-            netsocket["initialised"] = false;
             console.log(
                 "[INFO]\tWebsocket client running on " +
                     websocketUri +
@@ -125,11 +125,11 @@ class Client {
         });
     }
 
-    serverAuthAck(websocket, netsocket, message) {
+    serverAuthAck(websocket, message) {
         this.clientId = message["id"];
         console.log("[INFO]\tNew client ID: " + this.clientId);
 
-        netsocket.initialised = true;
+        websocket.initialised = true;
 
         message["signal"] = "CLIENT_AUTH_ACK";
         delete message.data;
@@ -138,9 +138,16 @@ class Client {
     }
 
     serverMsg(netsocket, message) {
-        if (message.data)
-            return this._send_netsocket_message(netsocket, message.data);
-        else return false;
+        let readyStateEvaluator = setInterval(() => {
+            if (netsocket.initialised === true) {
+                if (message.data) {
+                    this._send_netsocket_message(netsocket, message.data);
+                } else {
+                    console.log("[ERROR]\tNo message data found!");
+                }
+                clearInterval(readyStateEvaluator);
+            }
+        }, 15);
     }
 
     _send_websocket_message(websocket, input = {}) {
