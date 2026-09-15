@@ -115,7 +115,6 @@ class Client {
     }
 
     clientMsg(websocket, payload = "") {
-        console.log("[INFO]\tNew netsocket payload: " + payload + "\n");
         return this._send_websocket_message(websocket, {
             id: this.clientId,
             signal: "CLIENT_MSG",
