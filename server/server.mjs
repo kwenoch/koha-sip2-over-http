@@ -99,9 +99,8 @@ class Server {
 
         websocket.on("close", () => {
             console.log(
-                "[INFO]\tTerminating websocket connection " +
-                    websocket.clientId +
-                    " . . . ",
+                "[INFO]\tTerminating websocket connection: " +
+                    websocket.clientId,
             );
             if (websocket.netsocket != undefined) websocket.netsocket.end();
         });
@@ -123,6 +122,8 @@ class Server {
 
     clientAuthInit(websocket, message) {
         message["id"] = websocket.clientId;
+        console.log("[INFO]\tNew client ID: " + websocket.clientId);
+
         message["signal"] = "SERVER_AUTH_ACK";
         message["data"] = { result: "AUTH_OK" };
 
