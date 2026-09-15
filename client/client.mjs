@@ -149,7 +149,8 @@ class Client {
     }
 
     _readyWebsocket(websocket) {
-        if (websocket.readyState === 1) return true;
+        if (websocket.readyState === 1 && websocket["initialised"] === true)
+            return true;
         else return false;
     }
 
