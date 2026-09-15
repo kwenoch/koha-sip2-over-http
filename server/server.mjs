@@ -148,14 +148,22 @@ class Server {
     }
 
     _readyNetsocket(netsocket) {
+        setTimeout(() => {
+            return false;
+        }, 5000);
+
         while (true) {
             if (netsocket.readyState === "open") return true;
         }
     }
 
     _readyWebsocket(websocket) {
+        setTimeout(() => {
+            return false;
+        }, 5000);
+
         while (true) {
-            if (websocket.readyState === 1 && this.initialised === true)
+            if (websocket.readyState === 1 && websocket["initialised"] === true)
                 return true;
         }
     }
