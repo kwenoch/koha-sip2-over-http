@@ -88,7 +88,7 @@ class Client {
             );
 
             if (message.signal == "SERVER_AUTH_ACK")
-                this.serverAuthAck(websocket, netsocket, message);
+                this.serverAuthAck(websocket, message);
             else if (message.signal == "SERVER_MSG")
                 this.serverMsg(netsocket, message);
         });
