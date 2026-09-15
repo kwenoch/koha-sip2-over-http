@@ -46,7 +46,7 @@ class Server {
                     " . . . ",
             );
 
-            websocket.on("open", () => this.manageSession(websocket));
+            this.manageSession(websocket);
         });
     }
 
@@ -56,11 +56,14 @@ class Server {
 
         console.log("[INFO]\tNew websocket connected . . . ");
 
-        netsocket.on("data", (data) => {
-            const message = data.toString();
-            console.log("[INFO]\tNetsocket message received: " + message);
+        websocket.on("open", () => {
+            // nothing to do, keep event listener
+            // to nullify default behaviours
+        });
 
-            this.serverMsg(websocket, message);
+        netsocket.on("connect", () => {
+            // nothing to do, keep event listener
+            // to nullify default behaviours
         });
 
         websocket.on("message", (data) => {
@@ -74,6 +77,13 @@ class Server {
                 this.clientAuthInit(websocket, message);
             else if (message.signal == "CLIENT_MSG")
                 this.clientMsg(netsocket, message);
+        });
+
+        netsocket.on("data", (data) => {
+            const message = data.toString();
+            console.log("[INFO]\tNetsocket message received: " + message);
+
+            this.serverMsg(websocket, message);
         });
 
         websocket.on("close", () => {

@@ -43,12 +43,13 @@ class Client {
                     " . . . ",
             );
 
-            netsocket.on("ready", () => this.manageSession(netsocket));
+            this.manageSession(netsocket);
         });
     }
 
     manageSession(netsocket) {
         const websocket = netsocket["websocket"];
+
         console.log("[INFO]\tNew netsocket connected . . . ");
 
         netsocket.on("connect", () => {
@@ -82,18 +83,20 @@ class Client {
                 this.serverMsg(netsocket, message);
         });
 
-        websocket.on("close", () => {
-            console.log("[INFO]\tTerminating websocket connection . . . ");
-            if (netsocket != undefined) netsocket.end();
-            websocket = null;
-        });
-
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
             if (netsocket["websocket"] != undefined)
                 netsocket["websocket"].terminate();
             netsocket = null;
         });
+
+        websocket.on("close", () => {
+            console.log("[INFO]\tTerminating websocket connection . . . ");
+            if (netsocket != undefined) netsocket.end();
+            websocket = null;
+        });
+
+        netsocket.on("error", console.error);
 
         websocket.on("error", console.error);
 
