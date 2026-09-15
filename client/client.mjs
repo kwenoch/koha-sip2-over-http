@@ -155,7 +155,7 @@ class Client {
     }
 
     _send_netsocket_message(netsocket, input = "") {
-        const message = input.toString();
+        const message = input.toString().replace(/\r?\n|\r/g, "");
         if (typeof message !== "string") {
             console.log("[ERR]\tNetsocket message could not be stringified");
             return false;

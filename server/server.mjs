@@ -80,7 +80,7 @@ class Server {
         });
 
         netsocket.on("data", (data) => {
-            const message = data.toString();
+            const message = data.toString().replace(/\r?\n|\r/g, "");
             console.log("[INFO]\tNetsocket message received: " + message);
 
             this.serverMsg(websocket, message);
