@@ -143,25 +143,36 @@ class Client {
         else return false;
     }
 
-    _readyWebsocket(websocket) {
-        setTimeout(() => {
-            return false;
-        }, 5000);
-
-        while (true) {
-            if (websocket.readyState === 1 && this.initialised === true)
+    _readyNetsocket(netsocket) {
+        const maxIterations = 333;
+        let iterations = 0;
+        let readyStateEvaluation = setInterval(() => {
+            if (iterations > maxIterations) {
+                clearInterval(readyStateEvaluation);
+                return false;
+            } else if (netsocket.readyState === "open") {
+                clearInterval(readyStateEvaluation);
                 return true;
-        }
+            }
+
+            iterations++;
+        }, 15);
     }
 
-    _readyNetsocket(netsocket) {
-        setTimeout(() => {
-            return false;
-        }, 5000);
+    _readyWebsocket(websocket) {
+        const maxIterations = 333;
+        let iterations = 0;
+        let readyStateEvaluation = setInterval(() => {
+            if (iterations > maxIterations) {
+                clearInterval(readyStateEvaluation);
+                return false;
+            } else if (websocket.readyState === 1) {
+                clearInterval(readyStateEvaluation);
+                return true;
+            }
 
-        while (true) {
-            if (netsocket.readyState === "open") return true;
-        }
+            iterations++;
+        }, 15);
     }
 
     _send_websocket_message(websocket, input = {}) {
