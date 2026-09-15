@@ -193,8 +193,7 @@ class Server {
 
     end() {
         return this.websocketServer.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) client.terminate();
-            client = null;
+            if (client.readyState === 1) client.terminate();
             return true;
         });
     }

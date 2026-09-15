@@ -186,8 +186,7 @@ class Client {
     }
 
     end() {
-        this.websocket.terminate();
-        this.websocket = null;
+        this.netsocketServer.close();
         return true;
     }
 }
