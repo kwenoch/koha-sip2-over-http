@@ -28,6 +28,7 @@ class Client {
         console.log("[INFO]\tLaunching netsocket server . . . ");
         this.netsocketServer = new net.createServer();
         this.netsocketServer.listen({
+            host: this.config.sip2.host,
             port: this.config.sip2.port,
         });
         console.log(

@@ -28,6 +28,7 @@ class Server {
 
         console.log("[INFO]\tLaunching websocket server . . . ");
         this.websocketServer = new WebSocketServer({
+            host: this.config.websocket.host,
             port: this.config.websocket.port,
         });
         console.log(
