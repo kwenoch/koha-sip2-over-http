@@ -36,6 +36,7 @@ class Server {
 
         this.websocketServer.on("connection", (websocket) => {
             console.log("[INFO]\tLaunching netsocket client . . . ");
+            websocket["initialised"] = false;
             websocket["netsocket"] = new net.createConnection({
                 host: this.config.sip2.host,
                 port: this.config.sip2.port,
@@ -126,6 +127,7 @@ class Server {
         message["id"] = websocket.clientId;
         message["signal"] = "SERVER_AUTH_ACK";
         message["data"] = { result: "AUTH_OK" };
+        websocket["initialised"] = true;
 
         return this._send_websocket_message(websocket, message);
     }
@@ -147,7 +149,7 @@ class Server {
 
     _readyWebsocket(websocket) {
         let readyStateEnsure = setInterval(() => {
-            if (websocket.readyState === 1 && websocket["initialised"] === 1)
+            if (websocket.readyState === 1 && websocket["initialised"] === true)
                 clearInterval(readyStateEnsure);
         }, 15);
 

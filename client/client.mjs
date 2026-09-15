@@ -12,6 +12,7 @@ const rl = readline.createInterface({ input, output });
 class Client {
     constructor() {
         this.config = this.loadConfig();
+        this.initialised = false;
         this.netsocketServer = null;
         console.log("[INFO]\tLoaded client . . . ");
     }
@@ -126,6 +127,7 @@ class Client {
 
     serverAuthAck(websocket, message) {
         this.clientId = message["id"];
+        this.initialised = true;
         console.log("[INFO]\tNew client ID: " + this.clientId);
 
         message["signal"] = "CLIENT_AUTH_ACK";
@@ -143,7 +145,7 @@ class Client {
 
     _readyWebsocket(websocket) {
         let readyStateEnsure = setInterval(() => {
-            if (websocket.readyState === 1 && websocket["initialised"] === 1)
+            if (websocket.readyState === 1 && this.initialised === true)
                 clearInterval(readyStateEnsure);
             else console.log("not_ready");
         }, 15);
