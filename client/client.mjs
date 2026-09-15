@@ -126,6 +126,7 @@ class Client {
     }
 
     serverMsg(netsocket, message) {
+        console.log(message);
         if (message.data)
             return this._send_netsocket_message(netsocket, message.data);
         else return false;
