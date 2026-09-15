@@ -170,7 +170,7 @@ class Client {
                 clearInterval(readyStateEvaluation);
                 return true;
             }
-
+            console.log(iterations);
             iterations++;
         }, 15);
     }
