@@ -135,8 +135,18 @@ class Client {
             return false;
         }
 
-        websocket.send(message);
-        console.log("[INFO]\tWebsocket message sent: " + message);
+        let readyStateEnsure = setTimeout(() => {
+            if (websocket.readyState === WebSocket.OPEN) {
+                clearInterval(readyStateEnsure);
+                websocket.send(message);
+                console.log("[INFO]\tWebsocket message sent: " + message);
+            } else {
+                console.log(
+                    "[WARN]\tWaiting for websocket to send message . . . ",
+                );
+            }
+        }, 50);
+
         return true;
     }
 
@@ -147,8 +157,18 @@ class Client {
             return false;
         }
 
-        netsocket.write(message + "\r\n", "utf-8");
-        console.log("[INFO]\tNetsocket message sent: " + message);
+        let readyStateEnsure = setTimeout(() => {
+            if (netsocket.readyState === "open") {
+                clearInterval(readyStateEnsure);
+                netsocket.write(message + "\r\n", "utf-8");
+                console.log("[INFO]\tNetsocket message sent: " + message);
+            } else {
+                console.log(
+                    "[WARN]\tWaiting for websocket to send message . . . ",
+                );
+            }
+        }, 50);
+
         return true;
     }
 
