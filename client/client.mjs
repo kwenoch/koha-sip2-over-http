@@ -35,7 +35,6 @@ class Client {
         );
 
         this.netsocketServer.on("connection", (netsocket) => {
-            netsocket["initialised"] = false;
             console.log("[INFO]\tLaunching websocket client . . . ");
             netsocket["websocket"] = new WebSocket(websocketUri);
             console.log(
@@ -43,6 +42,7 @@ class Client {
                     websocketUri +
                     " . . . ",
             );
+            netsocket.websocket["initialised"] = false;
 
             this.manageSession(netsocket);
         });
@@ -138,7 +138,7 @@ class Client {
 
     serverMsg(netsocket, message) {
         let readyStateEvaluator = setInterval(() => {
-            if (netsocket.initialised === true) {
+            if (netsocket.websocket.initialised === true) {
                 if (message.data) {
                     this._send_netsocket_message(netsocket, message.data);
                 } else {
