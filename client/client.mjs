@@ -144,22 +144,16 @@ class Client {
     }
 
     _readyWebsocket(websocket) {
-        let readyStateEnsure = setInterval(() => {
+        while (true) {
             if (websocket.readyState === 1 && this.initialised === true)
-                clearInterval(readyStateEnsure);
-            else console.log("not_ready");
-        }, 15);
-
-        return true;
+                return true;
+        }
     }
 
     _readyNetsocket(netsocket) {
-        let readyStateEnsure = setInterval(() => {
-            if (netsocket.readyState === "open")
-                clearInterval(readyStateEnsure);
-        }, 15);
-
-        return true;
+        while (true) {
+            if (netsocket.readyState === "open") return true;
+        }
     }
 
     _send_websocket_message(websocket, input = {}) {

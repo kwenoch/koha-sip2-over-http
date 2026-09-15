@@ -147,22 +147,17 @@ class Server {
         });
     }
 
-    _readyWebsocket(websocket) {
-        let readyStateEnsure = setInterval(() => {
-            if (websocket.readyState === 1 && websocket["initialised"] === true)
-                clearInterval(readyStateEnsure);
-        }, 15);
-
-        return true;
+    _readyNetsocket(netsocket) {
+        while (true) {
+            if (netsocket.readyState === "open") return true;
+        }
     }
 
-    _readyNetsocket(netsocket) {
-        let readyStateEnsure = setInterval(() => {
-            if (netsocket.readyState === "open")
-                clearInterval(readyStateEnsure);
-        }, 15);
-
-        return true;
+    _readyWebsocket(websocket) {
+        while (true) {
+            if (websocket.readyState === 1 && this.initialised === true)
+                return true;
+        }
     }
 
     _send_websocket_message(websocket, input = {}) {
