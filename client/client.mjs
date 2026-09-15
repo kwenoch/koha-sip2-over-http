@@ -145,6 +145,7 @@ class Client {
         let readyStateEnsure = setTimeout(() => {
             if (websocket.readyState === 1 && websocket["initialised"] === 1)
                 clearInterval(readyStateEnsure);
+            else console.log("not_ready");
         }, 15);
 
         return true;
