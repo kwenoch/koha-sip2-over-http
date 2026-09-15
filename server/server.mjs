@@ -28,7 +28,7 @@ class Server {
 
         console.log("[INFO]\tLaunching websocket server . . . ");
         this.websocketServer = new WebSocketServer({
-            port: config.websocket.port,
+            port: this.config.websocket.port,
         });
         console.log(
             "[INFO]\tWebsocket server running on " + websocketUri + " . . . ",
@@ -37,8 +37,8 @@ class Server {
         this.websocketServer.on("connection", (websocket) => {
             console.log("[INFO]\tLaunching netsocket client . . . ");
             websocket["netsocket"] = new net.createConnection({
-                host: config.sip2.host,
-                port: config.sip2.port,
+                host: this.config.sip2.host,
+                port: this.config.sip2.port,
             });
             console.log(
                 "[INFO]\tNetsocket client running on " +
