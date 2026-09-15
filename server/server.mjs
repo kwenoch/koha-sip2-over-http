@@ -128,6 +128,9 @@ class Server {
         message["data"] = { result: "AUTH_OK" };
 
         websocket.netsocket.initialised = true;
+        console.log(
+            "[INFO]\tClient initialisation complete: " + websocket.clientId,
+        );
 
         return this._send_websocket_message(websocket, message);
     }

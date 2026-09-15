@@ -130,6 +130,7 @@ class Client {
         console.log("[INFO]\tNew client ID: " + this.clientId);
 
         websocket.initialised = true;
+        console.log("[INFO]\tClient initialisation complete . . . ");
 
         message["signal"] = "CLIENT_AUTH_ACK";
         delete message.data;
