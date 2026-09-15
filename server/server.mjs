@@ -128,7 +128,7 @@ class Server {
     }
 
     serverMsg(websocket, payload = "") {
-        console.log("[INFO]\tNew websocket payload: " + payload);
+        console.log("[INFO]\tNew netsocket payload: " + payload);
         return this._send_websocket_message(websocket, {
             id: websocket.clientId,
             signal: "SERVER_MSG",
