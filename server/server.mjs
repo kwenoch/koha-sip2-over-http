@@ -146,7 +146,7 @@ class Server {
     }
 
     _readyWebsocket(websocket) {
-        let readyStateEnsure = setTimeout(() => {
+        let readyStateEnsure = setInterval(() => {
             if (websocket.readyState === 1 && websocket["initialised"] === 1)
                 clearInterval(readyStateEnsure);
         }, 15);
@@ -155,7 +155,7 @@ class Server {
     }
 
     _readyNetsocket(netsocket) {
-        let readyStateEnsure = setTimeout(() => {
+        let readyStateEnsure = setInterval(() => {
             if (netsocket.readyState === "open")
                 clearInterval(readyStateEnsure);
         }, 15);

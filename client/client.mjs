@@ -142,7 +142,7 @@ class Client {
     }
 
     _readyWebsocket(websocket) {
-        let readyStateEnsure = setTimeout(() => {
+        let readyStateEnsure = setInterval(() => {
             if (websocket.readyState === 1 && websocket["initialised"] === 1)
                 clearInterval(readyStateEnsure);
             else console.log("not_ready");
@@ -152,7 +152,7 @@ class Client {
     }
 
     _readyNetsocket(netsocket) {
-        let readyStateEnsure = setTimeout(() => {
+        let readyStateEnsure = setInterval(() => {
             if (netsocket.readyState === "open")
                 clearInterval(readyStateEnsure);
         }, 15);
