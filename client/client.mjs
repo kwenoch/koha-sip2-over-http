@@ -97,13 +97,11 @@ class Client {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
             if (netsocket.websocket != undefined)
                 netsocket.websocket.terminate();
-            netsocket = null;
         });
 
         websocket.on("close", () => {
             console.log("[INFO]\tTerminating websocket connection . . . ");
             if (netsocket != undefined) netsocket.end();
-            netsocket.websocket = null;
         });
 
         netsocket.on("error", console.error);

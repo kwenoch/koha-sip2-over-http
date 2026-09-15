@@ -103,13 +103,11 @@ class Server {
                     " . . . ",
             );
             if (websocket.netsocket != undefined) websocket.netsocket.end();
-            websocket = null;
         });
 
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
             if (websocket != undefined) websocket.terminate();
-            websocket.netsocket = null;
         });
 
         websocket.on("error", console.error);
