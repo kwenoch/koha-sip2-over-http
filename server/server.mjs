@@ -82,7 +82,7 @@ class Server {
         const netsocket = websocket.netsocket;
         websocket["clientId"] = uuid().toString();
 
-        console.log("[INFO]\tNew websocket connected . . . ");
+        console.log("[INFO]\tNew netsocket connected . . . ");
 
         websocket.on("open", () => {
             // nothing to do, keep event listener

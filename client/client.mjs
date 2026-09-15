@@ -76,7 +76,7 @@ class Client {
     manageSession(netsocket) {
         const websocket = netsocket.websocket;
 
-        console.log("[INFO]\tNew netsocket connected . . . ");
+        console.log("[INFO]\tNew websocket connected . . . ");
 
         netsocket.on("connect", () => {
             // nothing to do, keep event listener
