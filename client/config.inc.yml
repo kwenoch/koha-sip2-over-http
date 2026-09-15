@@ -1,0 +1,9 @@
+---
+auth:
+  token: letmein
+websocket:
+  host: localhost
+  port: 8765
+sip2:
+  host: localhost
+  port: 6043

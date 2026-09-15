@@ -1,35 +1,29 @@
 #!/usr/bin/env node
 
 import * as net from "node:net";
-import { stdin as input, stdout as output } from "node:process";
+import { stdin, stdout } from "node:process";
 import * as readline from "node:readline/promises";
 import { v6 as uuid } from "uuid";
 import { WebSocket, WebSocketServer } from "ws";
+import * as yaml from "yaml";
 
-const rl = new readline.createInterface({ input, output });
-
-const config = {
-    websocket: {
-        host: "localhost",
-        port: 8765,
-    },
-    sip2: {
-        host: "localhost",
-        port: 6043,
-    },
-};
+const rl = new readline.createInterface({ stdin, stdout });
 
 class Server {
     constructor() {
+        this.config = this.loadConfig();
         this.websocketServer = null;
         console.log("[INFO]\tLoaded server . . . ");
     }
 
-    start() {
+    init() {
         const websocketUri =
-            "ws://" + config.websocket.host + ":" + config.websocket.port;
+            "ws://" +
+            this.config.websocket.host +
+            ":" +
+            this.config.websocket.port;
         const netsocketUri =
-            "tcp://" + config.sip2.host + ":" + config.sip2.port;
+            "tcp://" + this.config.sip2.host + ":" + this.config.sip2.port;
 
         console.log("[INFO]\tLaunching websocket server . . . ");
         this.websocketServer = new WebSocketServer({
@@ -92,17 +86,20 @@ class Server {
                     websocket.clientId +
                     " . . . ",
             );
-            if (netsocket != undefined) netsocket.end();
+            if (websocket["netsocket"] != undefined)
+                websocket["netsocket"].end();
             websocket = null;
         });
 
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
             if (websocket != undefined) websocket.terminate();
-            websocket["netsocket"] = null;
+            else websocket["netsocket"] = null;
         });
 
         websocket.on("error", console.error);
+
+        netsocket.on("error", console.error);
 
         // accept sip messages from stdin
         rl.on("line", (input) => {
@@ -157,9 +154,18 @@ class Server {
         return true;
     }
 
-    finish() {
+    loadConfig() {
+        const configFile = fs.readFileSync(
+            import.meta.dirname + "/" + "config.yml",
+            "utf8",
+        );
+        if (typeof configFile == "string") return yaml.parse(configFile);
+        else return false;
+    }
+
+    end() {
         return this.websocketServer.clients.forEach((client) => {
-            client.terminate();
+            if (client.readyState === WebSocket.OPEN) client.terminate();
             client = null;
             return true;
         });

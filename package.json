@@ -29,13 +29,15 @@
     "dependencies": {
         "uuid": "^14.0.2",
         "websockets": "^0.2.0",
-        "ws": "^8.21.3"
+        "ws": "^8.21.3",
+        "yaml": "^2.9.1"
     },
     "optionalDependencies": {
         "bufferutil": "^4.1.0"
     },
     "devDependencies": {
         "esbuild": "^0.28.2",
-        "postject": "^1.0.0-alpha.6"
+        "postject": "^1.0.0-alpha.6",
+        "util": "^0.12.5"
     }
 }

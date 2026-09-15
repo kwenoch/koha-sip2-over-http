@@ -2,16 +2,16 @@
 import Client from "./client.mjs";
 
 const client = new Client();
-client.start();
+client.init();
 
 process.on("SIGINT", () => {
-    (client.finish() && process.exit(0)) || process.exit(1);
+    (client.end() && process.exit(0)) || process.exit(1);
 });
 
 process.on("SIGQUIT", () => {
-    (client.finish() && process.exit(0)) || process.exit(1);
+    (client.end() && process.exit(0)) || process.exit(1);
 });
 
 process.on("SIGTERM", () => {
-    (client.finish() && process.exit(0)) || process.exit(1);
+    (client.end() && process.exit(0)) || process.exit(1);
 });

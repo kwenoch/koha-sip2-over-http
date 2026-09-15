@@ -1,36 +1,31 @@
 #!/usr/bin/env node
 
+import * as fs from "fs";
 import * as net from "node:net";
 import { stdin as input, stdout as output } from "node:process";
 import * as readline from "node:readline/promises";
 import { WebSocket } from "ws";
+import * as yaml from "yaml";
 
 const rl = readline.createInterface({ input, output });
-
-const config = {
-    websocket: {
-        host: "localhost",
-        port: 8765,
-    },
-    sip2: {
-        host: "localhost",
-        port: 6043,
-    },
-};
 
 class Client {
     constructor() {
         this.clientId = null;
+        this.config = this.loadConfig();
         this.netServer = null;
         this.websocket = null;
         console.log("[INFO]\tLoaded client . . . ");
     }
 
-    start() {
+    init() {
         const websocketUri =
-            "ws://" + config.websocket.host + ":" + config.websocket.port;
+            "ws://" +
+            this.config.websocket.host +
+            ":" +
+            this.config.websocket.port;
         const netsocketUri =
-            "tcp://" + config.sip2.host + ":" + config.sip2.port;
+            "tcp://" + this.config.sip2.host + ":" + this.config.sip2.port;
 
         console.log("[INFO]\tLaunching websocket client . . . ");
         this.websocket = new WebSocket(websocketUri);
@@ -116,7 +111,16 @@ class Client {
         return true;
     }
 
-    finish() {
+    loadConfig() {
+        const configFile = fs.readFileSync(
+            import.meta.dirname + "/" + "config.yml",
+            "utf8",
+        );
+        if (typeof configFile == "string") return yaml.parse(configFile);
+        else return false;
+    }
+
+    end() {
         this.websocket.terminate();
         this.websocket = null;
         return true;
