@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import * as fs from "fs";
 import * as net from "node:net";
 import { stdin as input, stdout as output } from "node:process";
 import * as readline from "node:readline/promises";
