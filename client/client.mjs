@@ -11,10 +11,8 @@ const rl = readline.createInterface({ input, output });
 
 class Client {
     constructor() {
-        this.clientId = null;
         this.config = this.loadConfig();
-        this.netServer = null;
-        this.websocket = null;
+        this.netsocketServer = null;
         console.log("[INFO]\tLoaded client . . . ");
     }
 
@@ -27,33 +25,48 @@ class Client {
         const netsocketUri =
             "tcp://" + this.config.sip2.host + ":" + this.config.sip2.port;
 
-        console.log("[INFO]\tLaunching websocket client . . . ");
-        this.websocket = new WebSocket(websocketUri);
-        console.log(
-            "[INFO]\tWebsocket client running on " + websocketUri + " . . . ",
-        );
-
         console.log("[INFO]\tLaunching netsocket server . . . ");
-        this.websocket["netsocket"] = new net.createServer();
-        this.websocket["netsocket"].listen(
-            this.config.sip2.port,
-            this.config.sip2.host,
-        );
+        this.netsocketServer = new net.createServer();
+        this.netsocketServer.listen({
+            port: this.config.sip2.port,
+        });
         console.log(
             "[INFO]\tNetsocket server running on " + netsocketUri + " . . . ",
         );
 
-        this.manageSession(this.websocket);
+        this.netsocketServer.on("connection", (netsocket) => {
+            console.log("[INFO]\tLaunching websocket client . . . ");
+            netsocket["websocket"] = new WebSocket(websocketUri);
+            console.log(
+                "[INFO]\tWebsocket client running on " +
+                    websocketUri +
+                    " . . . ",
+            );
+
+            this.manageSession(netsocket);
+        });
     }
 
-    manageSession(websocket) {
-        const netsocket = websocket["netsocket"];
-        console.log("[INFO]\tNew websocket connected . . . ");
+    manageSession(netsocket) {
+        const websocket = netsocket["websocket"];
+        console.log("[INFO]\tNew netsocket connected . . . ");
+
+        netsocket.on("connect", () => {
+            // nothing to do, keep event listener
+            // to nullify default behaviours
+        });
 
         websocket.on("open", () => {
             this._send_websocket_message(websocket, {
                 signal: "CLIENT_AUTH_INIT",
             });
+        });
+
+        netsocket.on("data", (data) => {
+            const message = data.toString();
+            console.log("[INFO]\tNetsocket message received: " + message);
+
+            this.clientMsg(websocket, message);
         });
 
         websocket.on("message", (data) => {
@@ -69,10 +82,16 @@ class Client {
                 this.serverMsg(netsocket, message);
         });
 
-        websocket.on("close", (status) => {
+        websocket.on("close", () => {
             console.log("[INFO]\tTerminating websocket connection . . . ");
-            this.websocket = null;
-            process.exit(status);
+            if (netsocket != undefined) netsocket.end();
+            websocket = null;
+        });
+
+        netsocket.on("end", () => {
+            console.log("[INFO]\tTerminating netsocket connection  . . . ");
+            if (netsocket["websocket"] != undefined) netsocket["websocket"].terminate();
+            netsocket = null;
         });
 
         websocket.on("error", console.error);

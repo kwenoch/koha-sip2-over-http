@@ -61,6 +61,11 @@ class Server {
             // to nullify default behaviours
         });
 
+        netsocket.on("connect", () => {
+            // nothing to do, keep event listener
+            // to nullify default behaviours
+        });
+
         websocket.on("message", (data) => {
             const message = JSON.parse(data);
             console.log(
@@ -95,7 +100,7 @@ class Server {
         netsocket.on("end", () => {
             console.log("[INFO]\tTerminating netsocket connection  . . . ");
             if (websocket != undefined) websocket.terminate();
-            else websocket["netsocket"] = null;
+            websocket["netsocket"] = null;
         });
 
         websocket.on("error", console.error);
