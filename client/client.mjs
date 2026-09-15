@@ -13,6 +13,9 @@ class Client {
     constructor() {
         this.config = this.loadConfig();
         this.netsocketServer = null;
+
+        if (!this.config) process.exit(127);
+
         console.log("[INFO]\tLoaded client . . . ");
     }
 
@@ -47,6 +50,11 @@ class Client {
 
             this.manageSession(netsocket);
         });
+
+        this.netsocketServer.on("close", () => {
+            // nothing to do, keep event listener
+            // to nullify default behaviours
+        });
     }
 
     loadConfig() {
@@ -54,8 +62,15 @@ class Client {
             import.meta.dirname + "/" + "config.yml",
             "utf8",
         );
-        if (typeof configFile == "string") return yaml.parse(configFile);
-        else return false;
+        const config = yaml.parse(configFile);
+
+        if (typeof config === "object") {
+            console.log("[INFO]\tConfig loaded successfully . . . ");
+            return config;
+        } else {
+            console.log("[ERROR]\tConfig loading failed . . . ");
+            return false;
+        }
     }
 
     manageSession(netsocket) {
@@ -186,8 +201,7 @@ class Client {
     }
 
     end() {
-        this.netsocketServer.close();
-        return true;
+        return this.netsocketServer.close();
     }
 }
 

@@ -14,6 +14,9 @@ class Server {
     constructor() {
         this.config = this.loadConfig();
         this.websocketServer = null;
+
+        if (!this.config) process.exit(127);
+
         console.log("[INFO]\tLoaded server . . . ");
     }
 
@@ -50,6 +53,13 @@ class Server {
 
             this.manageSession(websocket);
         });
+
+        this.websocketServer.on("close", () => {
+            this.websocketServer.clients.forEach((client) => {
+                if (client.readyState === 1) client.terminate();
+                return true;
+            });
+        });
     }
 
     loadConfig() {
@@ -57,8 +67,15 @@ class Server {
             import.meta.dirname + "/" + "config.yml",
             "utf8",
         );
-        if (typeof configFile == "string") return yaml.parse(configFile);
-        else return false;
+        const config = yaml.parse(configFile);
+
+        if (typeof config === "object") {
+            console.log("[INFO]\tConfig loaded successfully . . . ");
+            return config;
+        } else {
+            console.log("[ERROR]\tConfig loading failed . . . ");
+            return false;
+        }
     }
 
     manageSession(websocket) {
@@ -193,10 +210,7 @@ class Server {
     }
 
     end() {
-        return this.websocketServer.clients.forEach((client) => {
-            if (client.readyState === 1) client.terminate();
-            return true;
-        });
+        return this.websocketServer.close();
     }
 }
 
