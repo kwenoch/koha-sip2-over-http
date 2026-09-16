@@ -60,6 +60,16 @@ class Server {
                 return true;
             });
         });
+
+        this.websocketServer.on("error", (error) => {
+            this.websocketServer.close();
+
+            if (error.errno) {
+                return process.exit(error.errno);
+            } else {
+                return process.exit(127);
+            }
+        });
     }
 
     loadConfig() {

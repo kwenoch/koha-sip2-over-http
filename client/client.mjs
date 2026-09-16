@@ -55,6 +55,16 @@ class Client {
             // nothing to do, keep event listener
             // to nullify default behaviours
         });
+
+        this.netsocketServer.on("error", (error) => {
+            this.netsocketServer.close();
+
+            if (error.errno) {
+                return process.exit(error.errno);
+            } else {
+                return process.exit(127);
+            }
+        });
     }
 
     loadConfig() {
