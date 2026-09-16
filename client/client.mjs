@@ -120,9 +120,15 @@ class Client {
             if (netsocket != undefined) netsocket.end();
         });
 
-        netsocket.on("error", console.error);
+        netsocket.on("error", (error) => {
+            console.error(error);
+            netsocket.end();
+        });
 
-        websocket.on("error", console.error);
+        websocket.on("error", (error) => {
+            console.error(error);
+            netsocket.end();
+        });
 
         // accept sip messages from stdin
         rl.on("line", (input) => {

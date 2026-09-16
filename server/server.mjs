@@ -127,9 +127,15 @@ class Server {
             if (websocket != undefined) websocket.terminate();
         });
 
-        websocket.on("error", console.error);
+        websocket.on("error", (error) => {
+            console.error(error);
+            websocket.terminate();
+        });
 
-        netsocket.on("error", console.error);
+        netsocket.on("error", (error) => {
+            console.error(error);
+            websocket.terminate();
+        });
 
         // accept sip messages from stdin
         rl.on("line", (input) => {
