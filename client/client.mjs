@@ -132,12 +132,14 @@ class Client {
 
         netsocket.on("error", (error) => {
             console.error(error);
+            websocket.terminate();
             netsocket.end();
         });
 
         websocket.on("error", (error) => {
             console.error(error);
             websocket.terminate();
+            netsocket.end();
         });
 
         // accept sip messages from stdin
