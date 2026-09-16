@@ -39,12 +39,12 @@ class Server {
         );
 
         this.websocketServer.on("connection", (websocket) => {
+            websocket["initialised"] = false;
             console.log("[INFO]\tLaunching netsocket client . . . ");
             websocket["netsocket"] = new net.createConnection({
                 host: this.config.sip2.host,
                 port: this.config.sip2.port,
             });
-            websocket.netsocket["initialised"] = false;
             console.log(
                 "[INFO]\tNetsocket client running on " +
                     netsocketUri +
@@ -84,7 +84,7 @@ class Server {
             return config;
         } else {
             console.log("[ERROR]\tConfig loading failed . . . ");
-            return false;
+            return;
         }
     }
 
@@ -162,7 +162,7 @@ class Server {
         message["signal"] = "SERVER_AUTH_ACK";
         message["data"] = { result: "AUTH_OK" };
 
-        websocket.netsocket.initialised = true;
+        websocket.initialised = true;
         console.log(
             "[INFO]\tClient initialisation complete: " + websocket.clientId,
         );
@@ -171,31 +171,34 @@ class Server {
     }
 
     clientMsg(netsocket, message) {
-        let readyStateEvaluator = setInterval(() => {
-            if (netsocket.initialised === true) {
-                if (message.data) {
-                    this._send_netsocket_message(netsocket, message.data);
-                } else {
-                    console.log("[ERROR]\tNo message data found!");
-                }
-                clearInterval(readyStateEvaluator);
-            }
-        });
+        if (!message.data) {
+            console.log("[ERROR]\tNo message data found!");
+            return;
+        }
+
+        return this._send_netsocket_message(netsocket, message.data);
     }
 
     serverMsg(websocket, payload = "") {
-        return this._send_websocket_message(websocket, {
-            id: websocket.clientId,
-            signal: "SERVER_MSG",
-            data: payload,
-        });
+        let readyStateEvaluator = setInterval(() => {
+            if (websocket.initialised === true) {
+                this._send_websocket_message(websocket, {
+                    id: websocket.clientId,
+                    signal: "SERVER_MSG",
+                    data: payload,
+                });
+                clearInterval(readyStateEvaluator);
+            }
+        }, 15);
+
+        return true;
     }
 
     _send_websocket_message(websocket, input = {}) {
         const message = JSON.stringify(input);
         if (typeof message !== "string") {
             console.log("[ERR]\tWebsocket message could not be stringified");
-            return false;
+            return;
         }
 
         let readyStateEvaluator = setInterval(() => {
@@ -213,7 +216,7 @@ class Server {
         const message = input.toString().replace(/\r?\n|\r/g, "");
         if (typeof message !== "string") {
             console.log("[ERR]\tNetsocket message could not be stringified");
-            return false;
+            return;
         }
 
         let readyStateEvaluator = setInterval(() => {

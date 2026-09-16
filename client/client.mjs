@@ -149,11 +149,18 @@ class Client {
     }
 
     clientMsg(websocket, payload = "") {
-        return this._send_websocket_message(websocket, {
-            id: this.clientId,
-            signal: "CLIENT_MSG",
-            data: payload,
-        });
+        let readyStateEvaluator = setInterval(() => {
+            if (websocket.initialised === true) {
+                this._send_websocket_message(websocket, {
+                    id: this.clientId,
+                    signal: "CLIENT_MSG",
+                    data: payload,
+                });
+                clearInterval(readyStateEvaluator);
+            }
+        }, 15);
+
+        return true;
     }
 
     serverAuthAck(websocket, message) {
@@ -170,16 +177,13 @@ class Client {
     }
 
     serverMsg(netsocket, message) {
-        let readyStateEvaluator = setInterval(() => {
-            if (netsocket.websocket.initialised === true) {
-                if (message.data) {
-                    this._send_netsocket_message(netsocket, message.data);
-                } else {
-                    console.log("[ERROR]\tNo message data found!");
-                }
-                clearInterval(readyStateEvaluator);
-            }
-        }, 15);
+        if (!message.data) {
+            console.log("[ERROR]\tNo message data found!");
+            return;
+        }
+
+        this._send_netsocket_message(netsocket, message.data);
+        return true;
     }
 
     _send_websocket_message(websocket, input = {}) {
