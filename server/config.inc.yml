@@ -1,9 +1,14 @@
 ---
 auth:
+  # token=string, the auth token we'll use to ensure a client is legitimate. this is no replacement for sip2 auth!
   token: letmein
 websocket:
-  host: '127.0.0.1'
+  # host=string, the listen address for incoming connections. ideally, leave this, and proxy with a webserver
+  host: "127.0.0.1"
+  # port=number, between 1-65535, the port to launch the http server on
   port: 8765
 sip2:
-  host: '127.0.0.1'
+  # host=string, the target ip address to connect to. usually, this will be localhost
+  host: "127.0.0.1"
+  # port=number, between 1-65535, the port upon which your sip2 server is running
   port: 6001
