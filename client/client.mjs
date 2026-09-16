@@ -20,7 +20,7 @@ class Client {
     }
 
     init() {
-        const websocketUri = this.config.websocket.baseUri;
+        const websocketUri = this.config.websocket.baseUrl;
         const netsocketUri =
             "tcp://" + this.config.sip2.host + ":" + this.config.sip2.port;
 
