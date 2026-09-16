@@ -139,12 +139,14 @@ class Server {
 
         websocket.on("error", (error) => {
             console.error(error);
+            netsocket.end();
             websocket.terminate();
         });
 
         netsocket.on("error", (error) => {
             console.error(error);
             netsocket.end();
+            websocket.terminate();
         });
 
         // accept sip messages from stdin
